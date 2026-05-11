@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kanban Board — Sprint 12</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9f9f7;color:#1a1a1a;padding:2rem}
+    .top{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid #e5e5e0;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+    .top h1{font-size:20px;font-weight:600}
+    .sprint-label{font-size:12px;color:#999}
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+    .metric{background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:10px 12px}
+    .metric-label{font-size:11px;color:#888;margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em}
+    .metric-val{font-size:22px;font-weight:600}
+    .board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .col{background:#f0efea;border-radius:12px;padding:12px;min-height:400px}
+    .col.drag-over{outline:2px dashed #aaa;background:#e8e7e2}
+    .col-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .col-title{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em}
+    .col-count{font-size:11px;background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:1px 7px;color:#999}
+    .card{background:#fff;border:1px solid #e5e5e0;border-radius:8px;padding:10px;margin-bottom:8px;cursor:grab;user-select:none;transition:border-color .15s}
+    .card:hover{border-color:#bbb}
+    .card:active{cursor:grabbing;opacity:.5}
+    .card-title{font-size:12px;font-weight:600;color:#1a1a1a;margin-bottom:4px;line-height:1.4}
+    .card-pts{font-size:11px;color:#aaa;margin-bottom:6px}
+    .card-footer{display:flex;align-items:center;justify-content:space-between;gap:4px}
+    .tag{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600}
+    .t-design{background:#EEEDFE;color:#3C3489}
+    .t-eng{background:#E1F5EE;color:#085041}
+    .t-data{background:#FAEEDA;color:#633806}
+    .t-growth{background:#FAECE7;color:#712B13}
+    .pri{font-size:10px;font-weight:600}
+    .pri-high{color:#A32D2D}
+    .pri-med{color:#854F0B}
+    .pri-low{color:#3B6D11}
+    .avatar{width:20px;height:20px;border-radius:50%;background:#E6F1FB;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;color:#0C447C;flex-shrink:0}
+    @media(max-width:600px){.board,.summary{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+
+<div class="top">
+  <h1>Sprint 12 — Kanban Board</h1>
+  <span class="sprint-label">May 1 – May 14, 2025</span>
+</div>
+
+<div class="summary">
+  <div class="metric"><div class="metric-label">Total tasks</div><div class="metric-val" id="m-total">12</div></div>
+  <div class="metric"><div class="metric-label">In progress</div><div class="metric-val" id="m-prog" style="color:#185FA5">3</div></div>
+  <div class="metric"><div class="metric-label">In review</div><div class="metric-val" id="m-rev" style="color:#854F0B">3</div></div>
+  <div class="metric"><div class="metric-label">Done</div><div class="metric-val" id="m-done" style="color:#3B6D11">2</div></div>
+</div>
+
+<div class="board">
+  <div class="col" id="col-backlog" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="drop(event,'backlog')">
+    <div class="col-header"><span class="col-title">Backlog</span><span class="col-count" id="cnt-backlog">4</span></div>
+    <div id="cards-backlog">
+      <div class="card" draggable="true" ondragstart="drag(event,1)" id="card-1"><div class="card-title">Update onboarding flow copy</div><div class="card-pts">3 pts</div><div class="card-footer"><span class="tag t-design">Design</span><span class="pri pri-high">High</span><div class="avatar">SK</div></div></div>
+      <div class="card" draggable="true" ondragstart="drag(event,2)" id="card-2"><div class="card-title">Fix auth token expiry bug</div><div class="card-pts">2 pts</div><div class="card-footer"><span class="tag t-eng">Engineering</span><span class="pri pri-high">High</span><div class="avatar">DT</div></div></div>
+      <div class="card" draggable="true" ondragstart="drag(event,3)" id="card-3"><div class="card-title">Build retention cohort query</div><div class="card-pts">5 pts</div><div class="card-footer"><span class="tag t-data">Data</span><span class="pri pri-med">Med</span><div class="avatar">MR</div></div></div>
+      <div class="card" draggable="true" ondragstart="drag(event,4)" id="card-4"><div class="card-title">Draft Q3 newsletter</div><div class="card-pts">1 pt</div><div class="card-footer"><span class="tag t-growth">Growth</span><span class="pri pri-low">Low</span><div class="avatar">JL</div></div></div>
+    </div>
+  </div>
+
+  <div class="col" id="col-progress" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="drop(event,'progress')">
+    <div class="col-header"><span class="col-title">In Progress</span><span class="col-count" id="cnt-progress">3</span></div>
+    <div id="cards-progress">
+      <div class="card" draggable="true" ondragstart="drag(event,5)" id="card-5"><div class="card-title">Mobile nav redesign</div><div class="card-pts">5 pts</div><div class="card-footer"><span class="tag t-design">Design</span><span class="pri pri-high">High</span><div class="avatar">SK</div></div></div>
+      <div class="card" draggable="true" ondragstart="drag(event,6)" id="card-6"><div class="card-title">API rate limiter implementation</div><div class="card-pts">3 pts</div><div class="card-footer"><span class="tag t-eng">Engineering</span><span class="pri pri-high">High</span><div class="avatar">DT</div></div></div>
+      <div class="card" draggable="true" ondragstart="drag(event,7)" id="card-7"><div class="card-title">Funnel drop-off analysis</div><div class="card-pts">3 pts</div><div class="card-footer"><span class="tag t-data">Data</span><span class="pri pri-med">Med</span><div class="avatar">MR</div></div></div>
+    </div>
+  </div>
+
+  <div class="col" id="col-review" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="drop(event,'review')">
+    <div class="col-header"><span class="col-title">In Review</span><span class="col-count" id="cnt-review">3</span></div>
+    <div id="cards-review">
+      <div class="card" draggable="true" ondragstart="drag(event,8)" id="card-8"><div class="card-title">Referral program landing page</div><div class="card-pts">2 pts</div><div class="card-footer"><span class="tag t-growth">Growth</span><span class="pri pri-med">Med</span><div class="avatar">JL</div></div></div>
+      <div class="card" draggable="true" ondragstart="drag(event,9)" id="card-9"><div class="card-title">Design system token audit</div><div class="card-pts">2 pts</div><div class="card-footer"><span class="tag t-design">Design</span><span class="pri pri-med">Med</span><div class="avatar">SK</div></div></div>
+      <div class="card" draggable="true" ondragstart="drag(event,10)" id="card-10"><div class="card-title">User story mapping workshop</div><div class="card-pts">1 pt</div><div class="card-footer"><span class="tag t-eng">Engineering</span><span class="pri pri-low">Low</span><div class="avatar">DT</div></div></div>
+    </div>
+  </div>
+
+  <div class="col" id="col-done" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="drop(event,'done')">
+    <div class="col-header"><span class="col-title">Done</span><span class="col-count" id="cnt-done">2</span></div>
+    <div id="cards-done">
+      <div class="card" draggable="true" ondragstart="drag(event,11)" id="card-11"><div class="card-title">Sprint 11 retrospective doc</div><div class="card-pts">1 pt</div><div class="card-footer"><span class="tag t-data">Data</span><span class="pri pri-low">Low</span><div class="avatar">MR</div></div></div>
+      <div class="card" draggable="true" ondragstart="drag(event,12)" id="card-12"><div class="card-title">Stakeholder update email</div><div class="card-pts">1 pt</div><div class="card-footer"><span class="tag t-growth">Growth</span><span class="pri pri-med">Med</span><div class="avatar">JL</div></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let dragId=null;
+function drag(e,id){dragId=id;e.dataTransfer.effectAllowed='move';}
+function drop(e,col){
+  e.preventDefault();
+  document.querySelectorAll('.col').forEach(c=>c.classList.remove('drag-over'));
+  if(!dragId)return;
+  const card=document.getElementById('card-'+dragId);
+  if(!card)return;
+  document.getElementById('cards-'+col).appendChild(card);
+  dragId=null;
+  updateCounts();
+}
+function updateCounts(){
+  ['backlog','progress','review','done'].forEach(col=>{
+    document.getElementById('cnt-'+col).textContent=document.getElementById('cards-'+col).children.length;
+  });
+  document.getElementById('m-prog').textContent=document.getElementById('cards-progress').children.length;
+  document.getElementById('m-rev').textContent=document.getElementById('cards-review').children.length;
+  document.getElementById('m-done').textContent=document.getElementById('cards-done').children.length;
+}
+</script>
+</body>
+</html>
